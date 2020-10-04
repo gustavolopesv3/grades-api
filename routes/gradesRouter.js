@@ -101,4 +101,25 @@ router.get('/media/:subject/:type', async (req, res) => {
     res.status(400).send({ error: err.message });
   }
 });
+
+//retornar os 3 melhores da turma
+router.get('/best/:subject/:type', async (req, res) => {
+  console.log('Tres melhores');
+  try {
+    const data = await readFile('models/grades.json', 'utf8');
+    const json = JSON.parse(data);
+
+    const threeBest = json.grades
+      .filter(({ subject, type } = grade) => {
+        return subject === req.params.subject && type === req.params.type;
+      })
+      .sort((a, b) => {
+        return b.value - a.value;
+      })
+      .splice(0, 3);
+    return res.send(threeBest);
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+  }
+});
 export default router;
