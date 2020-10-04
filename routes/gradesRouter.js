@@ -63,7 +63,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 //buscar por student e subject e realizar soma
-router.get('/:student/:subject', async (req, res) => {
+router.get('/sum/:student/:subject', async (req, res) => {
   console.log('somando');
   try {
     const data = await readFile('models/grades.json', 'utf8');
@@ -79,6 +79,25 @@ router.get('/:student/:subject', async (req, res) => {
 
     return res.send({ Soma: sumGrade });
   } catch (error) {
+    res.status(400).send({ error: err.message });
+  }
+});
+
+// calcular a media
+router.get('/media/:subject/:type', async (req, res) => {
+  console.log('Media');
+  try {
+    const data = await readFile('models/grades.json', 'utf8');
+    const json = JSON.parse(data);
+
+    const totalGrades = json.grades.filter(({ subject, type } = grade) => {
+      return subject === req.params.subject && type === req.params.type;
+    });
+    const sumSubjecttype = totalGrades.reduce((acc, cur) => {
+      return acc + cur.value;
+    }, 0);
+    return res.json({ media: sumSubjecttype / totalGrades.length });
+  } catch (err) {
     res.status(400).send({ error: err.message });
   }
 });
