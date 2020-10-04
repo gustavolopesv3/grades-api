@@ -61,4 +61,25 @@ router.delete('/:id', async (req, res) => {
     res.status(400).send({ error: err.message });
   }
 });
+
+//buscar por student e subject e realizar soma
+router.get('/:student/:subject', async (req, res) => {
+  console.log('somando');
+  try {
+    const data = await readFile('models/grades.json', 'utf8');
+    const json = JSON.parse(data);
+
+    const grades = json.grades.filter(({ student, subject } = student) => {
+      return student === req.params.student && subject === req.params.subject;
+    });
+
+    const sumGrade = grades.reduce((acc, cur) => {
+      return acc + cur.value;
+    }, 0);
+
+    return res.send({ Soma: sumGrade });
+  } catch (error) {
+    res.status(400).send({ error: err.message });
+  }
+});
 export default router;
